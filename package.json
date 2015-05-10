@@ -1,0 +1,32 @@
+{
+  "name": "MobeApp",
+  "version": "0.0.0",
+  "description": "Code that does stuff",
+  "main": "server.js",
+  "dependencies": {
+    "body-parser": "^1.4.3",
+    "express": "^4.4.5"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Chonsk/MobeApp.git"
+  },
+  "keywords": [
+    "react",
+    "express",
+    "node"
+  ],
+  "author": "hannesahlgren",
+  "bugs": {
+    "url": "https://github.com/Chonsk/MobeApp/issues"
+  },
+  "homepage": "https://github.com/Chonsk/MobeApp",
+  "engines" : {
+    "node" : "0.12.x"
+  }
+}
