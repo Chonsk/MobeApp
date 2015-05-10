@@ -1,5 +1,3 @@
-[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
-
 # MobeApp
 
 This will be an awesome list with stuff in it [something]
