@@ -14,7 +14,20 @@ var fs = require('fs');
 var path = require('path');
 var express = require('express');
 var bodyParser = require('body-parser');
+var csv  = require('node-csvjsonlite');
 var app = express();
+
+var filename = './players.csv';
+var playersAsJson = {};
+
+csv.convert(filename).then( function(successData) {
+  console.log('CSV converted to JSON');
+  playersAsJson = successData;
+}, function(errorReason) {
+  console.log(errorReason);
+  // Error Reason is either a string ("File does not exist") 
+  // or an error object returned from require('fs').readFile 
+});
 
 app.set('port', (process.env.PORT || 3000));
 
@@ -22,11 +35,13 @@ app.use('/', express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
-app.get('/comments.json', function(req, res) {
-  fs.readFile('comments.json', function(err, data) {
+app.get('/players', function(req, res) {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(playersAsJson);
+  /*fs.readFile('comments.json', function(err, data) {
     res.setHeader('Content-Type', 'application/json');
     res.send(data);
-  });
+  });*/
 });
 
 app.post('/comments.json', function(req, res) {
