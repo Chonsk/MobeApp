@@ -30,7 +30,7 @@ var playersSimplifiedJson = [];
   // or an error object returned from require('fs').readFile 
 });*/
 
-// convert the csv file into json
+// convert the csv file into json and create simplified list json
 node_cj({
   input: "./players.csv",
   output: null
@@ -39,31 +39,20 @@ node_cj({
     console.error(err);
   }else {
     playersAsJson = result;
-    //console.log('CSV converted to JSON:', playersAsJson);
-    // simplify the json into something more light weight for player list
-    //console.log('simplified JSON:', playersJson[0]);
-    /*result.forEach(function(obj) {
-      console.log(obj.name); 
-    });*/
+
     var i = 0;
     for (var key in playersAsJson) {
       if (playersAsJson.hasOwnProperty(key)) {
-        console.log(playersAsJson[key].name);
-        console.log(playersAsJson[key].ranking);
-        var obj = {'name': playersAsJson[key].name, 'ranking': playersAsJson[key].ranking};
+        var obj = {'name': playersAsJson[key].name,
+                   'ranking': playersAsJson[key].ranking,
+                   'teamName':playersAsJson[key].teamName,
+                   'positionText':playersAsJson[key].positionText};
         playersSimplifiedJson[i] = obj;
         i++;
       }
     }
     console.log('simplified JSON:', playersSimplifiedJson);
-    /*for(var i in result) {
-      if (result.hasOwnProperty(i)) {
-        playersSimplifiedJson[i].ranking = result[i].ranking;
-        playersSimplifiedJson[i].playerName = result[i].playerName;
-      }
-    }*/
   }
-
 });
 
 

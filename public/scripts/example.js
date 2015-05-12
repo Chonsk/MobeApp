@@ -12,6 +12,21 @@ var PlayersPage = React.createClass({
       }.bind(this)
     });
   },
+  getInitialState: function() {
+    return {data: []};
+  },
+  componentDidMount: function() {
+    this.loadPlayersFromServer();
+    //setInterval(this.loadPlayersFromServer, this.props.pollInterval);
+  },
+  render: function() {
+    return (
+      <div className="PlayersPage">
+        <h1>Players</h1>
+        <PlayersList data={this.state.data} />
+      </div>
+    );
+  }
   /*handleCommentSubmit: function(comment) {
     var comments = this.state.data;
     comments.push(comment);
@@ -33,21 +48,6 @@ var PlayersPage = React.createClass({
       });
     });
   },*/
-  getInitialState: function() {
-    return {data: []};
-  },
-  componentDidMount: function() {
-    this.loadPlayersFromServer();
-    //setInterval(this.loadPlayersFromServer, this.props.pollInterval);
-  },
-  render: function() {
-    return (
-      <div className="PlayersPage">
-        <h1>Players</h1>
-        <PlayersList data={this.state.data} />
-      </div>
-    );
-  }
 });
 
 var PlayersList = React.createClass({
@@ -57,8 +57,7 @@ var PlayersList = React.createClass({
         // `key` is a React-specific concept and is not mandatory for the
         // purpose of this tutorial. if you're curious, see more here:
         // http://facebook.github.io/react/docs/multiple-components.html#dynamic-children
-        <PlayerItem name={player.name} key={index}>
-          {player.text}
+        <PlayerItem name={player.name} rank={player.ranking} position={player.positionText} team={player.teamName} key={index}>
         </PlayerItem>
       );
     });
@@ -75,35 +74,20 @@ var PlayerItem = React.createClass({
     return (
       <div className="comment">
         <h2 className="commentAuthor">
+          {this.props.rank}
           {this.props.name}
         </h2>
+        <span className="commentAuthor">
+          {this.props.position}
+        </span>
+        <span className="commentAuthor">
+          {this.props.team}
+        </span>
       </div>
     );
   }
 });
 
-/*var CommentForm = React.createClass({
-  handleSubmit: function(e) {
-    e.preventDefault();
-    var author = React.findDOMNode(this.refs.author).value.trim();
-    var text = React.findDOMNode(this.refs.text).value.trim();
-    if (!text || !author) {
-      return;
-    }
-    this.props.onCommentSubmit({author: author, text: text});
-    React.findDOMNode(this.refs.author).value = '';
-    React.findDOMNode(this.refs.text).value = '';
-  },
-  render: function() {
-    return (
-      <form className="commentForm" onSubmit={this.handleSubmit}>
-        <input type="text" placeholder="Your name" ref="author" />
-        <input type="text" placeholder="Say something..." ref="text" />
-        <input type="submit" value="Post" />
-      </form>
-    );
-  }
-});*/
 
 React.render(
   <PlayersPage url="players" />,
