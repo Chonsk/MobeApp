@@ -43,7 +43,8 @@ node_cj({
     var i = 0;
     for (var key in playersAsJson) {
       if (playersAsJson.hasOwnProperty(key)) {
-        var obj = {'name': playersAsJson[key].name,
+        var obj = {'id': playersAsJson[key].playerId,
+                   'name': playersAsJson[key].name,
                    'ranking': playersAsJson[key].ranking,
                    'teamName':playersAsJson[key].teamName,
                    'positionText':playersAsJson[key].positionText};
@@ -63,23 +64,16 @@ app.use('/', express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
-app.get('/players', function(req, res) {
+app.get('/api/players', function(req, res) {
   res.setHeader('Content-Type', 'application/json');
   res.send(playersAsJson);
 });
 
-app.post('/comments.json', function(req, res) {
-  fs.readFile('comments.json', function (err, data) {
-    var comments = JSON.parse(data);
-    comments.push(req.body);
-    fs.writeFile('comments.json', JSON.stringify(comments, null, 4), function(err) {
-      res.setHeader('Content-Type', 'application/json');
-      res.setHeader('Cache-Control', 'no-cache');
-      res.send(JSON.stringify(comments));
-    });
-  });
+///api/player/:id
+app.get('/api/player/:id', function (req, res) {
+  console.log('asking for ', req.params.id);
+  res.end();
 });
-
 
 app.listen(app.get('port'), function () {
   console.log('Server started: http://localhost:' + app.get('port') + '/');
