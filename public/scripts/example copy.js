@@ -1,6 +1,31 @@
+/**
+ * This file provided by Facebook is for non-commercial testing and evaluation purposes only.
+ * Facebook reserves all rights not expressly granted.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ * FACEBOOK BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+ * ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 
-var PlayersPage = React.createClass({
-  loadPlayersFromServer: function() {
+var Comment = React.createClass({
+  render: function () {
+    var rawMarkup = marked(this.props.children.toString(), {sanitize: true});
+    return (
+      <div className="comment">
+        <h2 className="commentAuthor">
+          {this.props.author}
+        </h2>
+        <span dangerouslySetInnerHTML={{__html: rawMarkup}} />
+      </div>
+    );
+  }
+});
+
+var CommentBox = React.createClass({
+  loadCommentsFromServer: function() {
     $.ajax({
       url: this.props.url,
       dataType: 'json',
@@ -12,7 +37,7 @@ var PlayersPage = React.createClass({
       }.bind(this)
     });
   },
-  /*handleCommentSubmit: function(comment) {
+  handleCommentSubmit: function(comment) {
     var comments = this.state.data;
     comments.push(comment);
     this.setState({data: comments}, function() {
@@ -32,34 +57,35 @@ var PlayersPage = React.createClass({
         }.bind(this)
       });
     });
-  },*/
+  },
   getInitialState: function() {
     return {data: []};
   },
   componentDidMount: function() {
-    this.loadPlayersFromServer();
-    //setInterval(this.loadPlayersFromServer, this.props.pollInterval);
+    this.loadCommentsFromServer();
+    setInterval(this.loadCommentsFromServer, this.props.pollInterval);
   },
   render: function() {
     return (
-      <div className="PlayersPage">
-        <h1>Players</h1>
-        <PlayersList data={this.state.data} />
+      <div className="commentBox">
+        <h1>Comments</h1>
+        <CommentList data={this.state.data} />
+        <CommentForm onCommentSubmit={this.handleCommentSubmit} />
       </div>
     );
   }
 });
 
-var PlayersList = React.createClass({
+var CommentList = React.createClass({
   render: function() {
-    var commentNodes = this.props.data.map(function(player, index) {
+    var commentNodes = this.props.data.map(function(comment, index) {
       return (
         // `key` is a React-specific concept and is not mandatory for the
         // purpose of this tutorial. if you're curious, see more here:
         // http://facebook.github.io/react/docs/multiple-components.html#dynamic-children
-        <PlayerItem name={player.name} key={index}>
-          {player.text}
-        </PlayerItem>
+        <Comment author={comment.author} key={index}>
+          {comment.text}
+        </Comment>
       );
     });
     return (
@@ -70,19 +96,7 @@ var PlayersList = React.createClass({
   }
 });
 
-var PlayerItem = React.createClass({
-  render: function () {
-    return (
-      <div className="comment">
-        <h2 className="commentAuthor">
-          {this.props.name}
-        </h2>
-      </div>
-    );
-  }
-});
-
-/*var CommentForm = React.createClass({
+var CommentForm = React.createClass({
   handleSubmit: function(e) {
     e.preventDefault();
     var author = React.findDOMNode(this.refs.author).value.trim();
@@ -103,9 +117,9 @@ var PlayerItem = React.createClass({
       </form>
     );
   }
-});*/
+});
 
 React.render(
-  <PlayersPage url="players" />,
+  <CommentBox url="comments.json" pollInterval={2000} />,
   document.getElementById('content')
 );

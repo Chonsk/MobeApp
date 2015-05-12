@@ -14,20 +14,59 @@ var fs = require('fs');
 var path = require('path');
 var express = require('express');
 var bodyParser = require('body-parser');
-var csv  = require('node-csvjsonlite');
+//var csv  = require('node-csvjsonlite');
+var node_cj = require("node-csv-json");
 var app = express();
 
-var filename = './players.csv';
-var playersAsJson = {};
+var playersJson = [];
+var playersSimplifiedJson = [];
 
-csv.convert(filename).then( function(successData) {
-  console.log('CSV converted to JSON');
+/*csv.convert('./players.csv').then(function (successData) {
+  //console.log('CSV converted to JSON:', successData);
   playersAsJson = successData;
-}, function(errorReason) {
+}, function (errorReason) {
   console.log(errorReason);
   // Error Reason is either a string ("File does not exist") 
   // or an error object returned from require('fs').readFile 
+});*/
+
+// convert the csv file into json
+node_cj({
+  input: "./players.csv",
+  output: null
+}, function (err, result) {
+  if(err) {
+    console.error(err);
+  }else {
+    playersAsJson = result;
+    //console.log('CSV converted to JSON:', playersAsJson);
+    // simplify the json into something more light weight for player list
+    //console.log('simplified JSON:', playersJson[0]);
+    /*result.forEach(function(obj) {
+      console.log(obj.name); 
+    });*/
+    var i = 0;
+    for (var key in playersAsJson) {
+      if (playersAsJson.hasOwnProperty(key)) {
+        console.log(playersAsJson[key].name);
+        console.log(playersAsJson[key].ranking);
+        var obj = {'name': playersAsJson[key].name, 'ranking': playersAsJson[key].ranking};
+        playersSimplifiedJson[i] = obj;
+        i++;
+      }
+    }
+    console.log('simplified JSON:', playersSimplifiedJson);
+    /*for(var i in result) {
+      if (result.hasOwnProperty(i)) {
+        playersSimplifiedJson[i].ranking = result[i].ranking;
+        playersSimplifiedJson[i].playerName = result[i].playerName;
+      }
+    }*/
+  }
+
 });
+
+
 
 app.set('port', (process.env.PORT || 3000));
 
@@ -38,14 +77,10 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.get('/players', function(req, res) {
   res.setHeader('Content-Type', 'application/json');
   res.send(playersAsJson);
-  /*fs.readFile('comments.json', function(err, data) {
-    res.setHeader('Content-Type', 'application/json');
-    res.send(data);
-  });*/
 });
 
 app.post('/comments.json', function(req, res) {
-  fs.readFile('comments.json', function(err, data) {
+  fs.readFile('comments.json', function (err, data) {
     var comments = JSON.parse(data);
     comments.push(req.body);
     fs.writeFile('comments.json', JSON.stringify(comments, null, 4), function(err) {
@@ -57,6 +92,6 @@ app.post('/comments.json', function(req, res) {
 });
 
 
-app.listen(app.get('port'), function() {
+app.listen(app.get('port'), function () {
   console.log('Server started: http://localhost:' + app.get('port') + '/');
 });

@@ -6,7 +6,7 @@
   "dependencies": {
     "body-parser": "^1.4.3",
     "express": "^4.4.5",
-    "node-csvjsonlite": "^1.1.1"
+    "node-csv-json": "^0.2.1"
   },
   "devDependencies": {},
   "scripts": {
