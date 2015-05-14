@@ -1,9 +1,6 @@
 (function () {
   'use strict';
-  
-  var React = require('react');
-  var Router = require('react-router');
-  
+
   var App = React.createClass({
     loadPlayersFromServer: function() {
       $.ajax({
@@ -25,9 +22,9 @@
     },
     render: function() {
       return (
-        <div className="PlayersPage">
-        <h1>Players</h1>
-        <PlayersList data={this.state.data} />
+        <div>
+          <div className="playerlist_title" >Player ranking</div>
+          <PlayersList data={this.state.data} />
         </div>
       );
     }
@@ -38,16 +35,16 @@
       var commentNodes = this.props.data.map(function(player, index) {
         return (
           <PlayerItem name={player.name} 
-          rank={player.ranking}
-          position={player.positionText}
-          team={player.teamName}
-          key={index}>
+                      rank={player.ranking}
+                      position={player.positionText}
+                      team={player.teamName}
+                      key={index}>
           </PlayerItem>
         );
       });
       return (
         <div className="commentList">
-        {commentNodes}
+          {commentNodes}
         </div>
       );
     }
@@ -56,43 +53,48 @@
   var PlayerItem = React.createClass({
     mixins: [ReactLayeredComponentMixin],
     handleClick: function() {
-      console.log("handleClick event");
+      console.log("handleClick event. shown state: ",this.state.shown);
       this.setState({shown: !this.state.shown});
     },
     getInitialState: function() {
       return {shown: false, ticks: 0, modalShown: false};
     },
     componentDidMount: function() {
+      console.log("PlayerItem.componentDidMount");
       setInterval(this.tick, 1000);
     },
     tick: function() {
+      console.log("PlayerItem.tick");
       this.setState({ticks: this.state.ticks + 1});
     },
     renderLayer: function() {
+      console.log("PlayerItem.renderLayer");
       if (!this.state.shown) {
         return <span />;
       }
       return (
         <Modal onRequestClose={this.handleClick}>
-        <h1>Hello!</h1>
-        Look at these sweet reactive updates: {this.state.ticks}
+          <h1>Hello!</h1>
+          Look at these sweet reactive updates: {this.state.ticks}
         </Modal>
       );
     },
     render: function() {
       return (
-        <div className="comment" >
-        <h2 className="commentAuthor">
-        {this.props.rank}
-        {this.props.name}
-        </h2>
-        <span className="commentAuthor">
-        {this.props.position}
-        </span>
-        <span className="commentAuthor">
-        {this.props.team}
-        </span>
-        <a href="javascript:;" role="button" onClick={this.handleClick}>Click to toggle modal</a>
+        <div className="playerlist_item" onClick={this.handleClick}>
+          
+          <div className="playerlist_item_rank">
+            {this.props.rank}
+          </div>
+          
+          <div className="playerlist_item_right_container">
+            <div className="playerlist_item_name">
+              {this.props.name}
+            </div>
+            <div className="playerlist_item_subinfo">
+              {this.props.position + ', ' + this.props.team}
+            </div>
+          </div>
         </div>
       );
     }
@@ -107,6 +109,7 @@
       this._renderLayer();
     },
     componentDidMount: function() {
+      console.log("ReactLayeredComponentMixin.componentDidMount");
       // Appending to the body is easier than managing the z-index of everything on the page.
       // It's also better for accessibility and makes stacking a snap (since components will stack
       // in mount order).
@@ -115,12 +118,14 @@
       this._renderLayer();
     },
     _renderLayer: function() {
+      console.log("ReactLayeredComponentMixin._renderLayer");
       // By calling this method in componentDidMount() and componentDidUpdate(), you're effectively
       // creating a "wormhole" that funnels React's hierarchical updates through to a DOM node on an
       // entirely different part of the page.
       React.renderComponent(this.renderLayer(), this._target);
     },
     _unrenderLayer: function() {
+      console.log("ReactLayeredComponentMixin._unrenderLayer");
       React.unmountComponentAtNode(this._target);
     }
   };
@@ -137,50 +142,48 @@
       this.props.onRequestClose();
     },
     render: function() {
+      console.log("Modal.render");
       return this.transferPropsTo(
         <div className="ModalBackdrop" onClick={this.handleBackdropClick}>
-        <div className="ModalContent" onClick={this.killClick}>
-        {this.props.children}
-        </div>
+          <div className="ModalContent" onClick={this.killClick}>
+            {this.props.children}
+          </div>
         </div>
       );
     }
   });
 
-  var ModalLink = React.createClass({
-    mixins: [ReactLayeredComponentMixin],
-    handleClick: function() {
-      this.setState({shown: !this.state.shown});
-    },
-    getInitialState: function() {
-      return {shown: false, ticks: 0, modalShown: false};
-    },
-    componentDidMount: function() {
-      setInterval(this.tick, 1000);
-    },
-    tick: function() {
-      this.setState({ticks: this.state.ticks + 1});
-    },
-    renderLayer: function() {
-      if (!this.state.shown) {
-        return <span />;
-      }
-      return (
-        <Modal onRequestClose={this.handleClick}>
-        <h1>Hello!</h1>
-        Look at these sweet reactive updates: {this.state.ticks}
-        </Modal>
-      );
-    },
-    render: function() {
-      return <a href="javascript:;" role="button" onClick={this.handleClick}>Click to toggle modal</a>;
-    }
-  });
-
+  /*  var ModalLink = React.createClass({
+            mixins: [ReactLayeredComponentMixin],
+            handleClick: function() {
+            this.setState({shown: !this.state.shown});
+            },
+            getInitialState: function() {
+            return {shown: false, ticks: 0, modalShown: false};
+            },
+            componentDidMount: function() {
+            setInterval(this.tick, 1000);
+            },
+            tick: function() {
+            this.setState({ticks: this.state.ticks + 1});
+            },
+            renderLayer: function() {
+            if (!this.state.shown) {
+            return <span />;
+            }
+            return (
+            <Modal onRequestClose={this.handleClick}>
+              <h1>Hello!</h1>
+              Look at these sweet reactive updates: {this.state.ticks}
+            </Modal>
+            );
+            },
+            render: function() {
+            return <a href="javascript:;" role="button" onClick={this.handleClick}>Click to toggle modal</a>;
+            }
+            });
+            */
   //React.renderComponent(<ModalLink />, document.body);
-  React.render(
-    <App url="api/players" />,
-    document.getElementById('content')
-  );
+  React.render(<App url="api/players" />, document.body);
 
 }());

@@ -8,7 +8,8 @@
     "express": "^4.4.5",
     "node-csv-json": "^0.2.1",
     "react": "^0.13.3",
-    "react-router": "^0.13.3"
+    "react-router": "^0.13.3",
+    "react-tools": "^0.13.3"
   },
   "devDependencies": {},
   "scripts": {

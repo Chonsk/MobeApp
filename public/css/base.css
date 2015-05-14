@@ -1,65 +1,12 @@
 body {
-  background: #fff;
+  background: #fafafa;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 15px;
+  font-size: 30px;
   line-height: 1.7;
   margin: 0;
-  padding: 30px;
+  padding: 20px;
 }
 
-a {
-  color: #4183c4;
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: underline;
-}
-
-code {
-  background-color: #f8f8f8;
-  border: 1px solid #ddd;
-  border-radius: 3px;
-  font-family: "Bitstream Vera Sans Mono", Consolas, Courier, monospace;
-  font-size: 12px;
-  margin: 0 2px;
-  padding: 0px 5px;
-}
-
-h1, h2, h3, h4 {
-  font-weight: bold;
-  margin: 0 0 15px;
-  padding: 0;
-}
-
-h1 {
-  border-bottom: 1px solid #ddd;
-  font-size: 2.5em;
-  font-weight: bold;
-  margin: 0 0 15px;
-  padding: 0;
-}
-
-h2 {
-  border-bottom: 1px solid #eee;
-  font-size: 2em;
-}
-
-h3 {
-  font-size: 1.5em;
-}
-
-h4 {
-  font-size: 1.2em;
-}
-
-p, ul {
-  margin: 15px 0;
-}
-
-ul {
-  padding-left: 30px;
-}
 .ModalBackdrop {
   position: fixed;
   left: 0;
@@ -67,4 +14,79 @@ ul {
   top: 0;
   bottom: 0;
   background: rgba(0,0,0,0.5);
+}
+
+.ModalContent {
+  background: white;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 25px;
+  width: 400px;
+}
+
+.playerlist_title {
+  min-width: calc(720px - 16.5rem);
+  background: #3EA86F;
+  color: #0E271A;
+  border-radius: 0.5rem;
+  font-size: 4rem;
+  font-weight: bold;
+  padding: 1rem 8.5rem;
+}
+
+.playerlist_item {
+  height: 7rem;
+  min-width: 720px;
+  background: #3EA86F;
+  color: #fff;
+  display: flex;
+  margin-top: 0.5rem;
+  border-radius: 0.5rem;
+  border-left: 0.5rem solid #2F8C5A;
+  cursor: pointer;
+  transition: background 200ms;
+}
+.playerlist_item:hover {
+  transition: background 100ms;
+  background: #3a9f68;
+}
+.playerlist_item_rank {
+  background: #2F8C5A;
+  width: 5rem;
+  height: 100%;
+  font-size: 3.5rem;
+  text-align: center;
+  margin-right: 3rem;
+}
+
+.playerlist_item_rank::after {
+  border-top: 0rem solid transparent;
+  border-bottom: 7rem solid transparent;
+  border-left: 3rem solid #2F8C5A;
+  content: "";
+  position: absolute;
+  left: 6.7rem;
+}
+
+.playerlist_item_right_container {
+  width: calc( 100% - 9rem);
+  height: 100%!important;
+  display: block;
+}
+.playerlist_item_subinfo {
+  font-size: 1.5rem;
+  opacity: 0.8;
+  transform: translateY(0.3rem);
+}
+.playerlist_item_name {
+  height: 4rem;
+  font-size: 3.5rem;
+  transform: translateY(-0.3rem);
+}
+
+.playerlist_item_team {
+  color: white;
+}
+
+.playerlist_item_position {
 }
