@@ -11,6 +11,23 @@
     playersJson = [],
     playersSimplifiedJson = [];
 
+  
+  // find the player we are looking for
+  function getPlayerById(id) {
+    var key;
+    if(!playersJson) {return {}}
+    for (key in playersJson) {
+      if (playersJson.hasOwnProperty(key) && playersJson[key].playerId === id) {
+        /*obj = {'id': playersJson[key].playerId,
+               'name': playersJson[key].name,
+               'ranking': playersJson[key].ranking,
+               'teamName': playersJson[key].teamName,
+               'positionText': playersJson[key].positionText};*/
+        return playersJson[key];
+      }
+    }
+  }
+  
   // convert the csv file into json and create simplified list json
   node_cj({
     input: "./players.csv",
@@ -30,9 +47,12 @@
                  'teamName': playersJson[key].teamName,
                  'positionText': playersJson[key].positionText};
           playersSimplifiedJson.push(obj);
+          if(playersJson[key].ranking === '1'){
+            console.log('simplified JSON:', obj);
+          }
         }
       }
-      console.log('simplified JSON:', playersSimplifiedJson);
+      //console.log('simplified JSON:', playersSimplifiedJson);
     }
   });
 
@@ -50,9 +70,10 @@
 
   ///api/player/:id
   app.get('/api/player/:id', function (req, res) {
-    console.log('asking for ', req.params.id);
-    res.send('asking for ' + req.params.id);
-    res.end();
+    var obj = getPlayerById(req.params.id);
+    console.log('asking for ', obj);
+    res.setHeader('Content-Type', 'application/json');
+    res.send(obj);
   });
 
   app.listen(app.get('port'), function () {

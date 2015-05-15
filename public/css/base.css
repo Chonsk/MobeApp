@@ -21,7 +21,7 @@ body {
   margin-left: auto;
   margin-right: auto;
   margin-top: 25px;
-  width: 400px;
+  width: 80%;
 }
 
 .playerlist_title {
@@ -89,4 +89,21 @@ body {
 }
 
 .playerlist_item_position {
+}
+
+.player_info {
+  height: 4rem;
+  border-bottom: 1px solid gray;
+  margin: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 0.5rem;
+}
+
+.info_title {
+  font-size: 1.5rem;
+}
+.info_value {
+  font-size: 1.5rem;
 }
