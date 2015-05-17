@@ -7,22 +7,34 @@ body {
   padding: 20px;
 }
 
-.ModalBackdrop {
+.popup_backdrop {
   position: fixed;
   left: 0;
   right: 0;
   top: 0;
   bottom: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.3);
 }
 
-.ModalContent {
+.popup_content {
   background: white;
   margin-left: auto;
   margin-right: auto;
-  margin-top: 25px;
-  width: 80%;
+  margin-top: 4rem;
+  width: 60%;
+  min-width: 30rem;
+  border-radius: 0.5rem;
+  border-top: 0.5rem solid #3EA86F;
 }
+.hidden {
+  opacity: 0.01;
+  transition: .2s ease-in;
+}
+.visible {
+  opacity: 1;
+  transition: .2s ease-in;
+}
+
 
 .playerlist_title {
   min-width: calc(720px - 16.5rem);
@@ -91,19 +103,52 @@ body {
 .playerlist_item_position {
 }
 
+.player_info_header {
+  height: 2rem;
+  background: #60ce93;
+  color: #fff;
+  padding: 0 1rem;
+  overflow: hidden;
+  font-size: 1rem;
+  text-transform: uppercase;
+  padding-top: 5px;
+  text-align: center;
+}
+
+.player_header {
+  height: 7rem;
+  background: #3EA86F;
+  color: #fff;
+  display: flex;
+  transition: background 200ms;
+  padding: 0 1rem;
+  overflow: hidden;
+}
+
 .player_info {
-  height: 4rem;
-  border-bottom: 1px solid gray;
-  margin: 1rem;
+  height: 2.5rem;
+  border-bottom: 1px solid #ddd;
+  padding: 0 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-radius: 0.5rem;
+  color: #666;
+  font-size: 1.2rem;
 }
 
-.info_title {
-  font-size: 1.5rem;
+.player_info:last-child {
+  border-bottom: 0px solid #ccc;
 }
+
 .info_value {
-  font-size: 1.5rem;
+  
 }
+
+.card {
+  border-radius: 0.2rem;
+  display: inline-block;
+  padding: 0 0.4rem;
+  margin-left: 0.5rem;
+}
+.yellow { background: rgb(237, 237, 66); color: black;}
+.red { background: rgb(244, 45, 45); color: white;}

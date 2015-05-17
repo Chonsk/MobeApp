@@ -1,38 +1,29 @@
 (function () {
   'use strict';
-  
+
   var LayeredComponentMixin = {
     componentDidMount: function() {
-      // Appending to the body is easier than managing the z-index of
-      // everything on the page.  It's also better for accessibility and
-      // makes stacking a snap (since components will stack in mount order).
       console.log("LayeredComponentMixin.componentDidMount");
-      this._layer = document.createElement('div');
-      document.body.appendChild(this._layer);
+      this._layer = document.getElementById('popup_node');
       this._renderLayer();
     },
 
     componentDidUpdate: function() {
+      console.log("LayeredComponentMixin.componentDidUpdate");
       this._renderLayer();
     },
 
     componentWillUnmount: function() {
+      console.log("LayeredComponentMixin.componentWillUnmount");
       this._unrenderLayer();
-      document.body.removeChild(this._layer);
+      var popupNode = document.getElementById('popup_node');
+      popupNode.removeChild(this._layer);
     },
 
     _renderLayer: function() {
       console.log("LayeredComponentMixin._renderLayer");
-      // By calling this method in componentDidMount() and
-      // componentDidUpdate(), you're effectively creating a "wormhole" that
-      // funnels React's hierarchical updates through to a DOM node on an
-      // entirely different part of the page.
-
       var layerElement = this.renderLayer();
-      // Renders can return null, but React.render() doesn't like being asked
-      // to render null. If we get null back from renderLayer(), just render
-      // a noscript element, like React does when an element's render returns
-      // null.
+
       if (layerElement === null) {
         React.render(<noscript />, this._layer);
       } else {
@@ -45,39 +36,49 @@
     },
 
     _unrenderLayer: function() {
+      console.log("LayeredComponentMixin._unrenderLayer");
       if (this.layerWillUnmount) {
         this.layerWillUnmount(this._layer);
       }
-
       React.unmountComponentAtNode(this._layer);
     }
   };
 
   var App = React.createClass({
-    /*mixins: [LayeredComponentMixin],
-    getInitialState: function() {
-      return {shown: false, modalShown: false};
+    mixins: [LayeredComponentMixin],
+    handleClick: function() {
+      //console.log("PlayerItem.handleClick");
+      var that = this;
+      document.getElementById('popup_node').className = 'hidden';
+      setTimeout(function() {
+        that.setState({shown: !that.state.shown});
+      }, 200);
     },
-    componentDidMount: function() {
-      console.log("App.componentDidMount");
+    getInitialState: function() {
+      return {shown: false, activePlayer: 0};
     },
     renderLayer: function() {
-      console.log("App.renderLayer");
+      //console.log("PlayerItem.renderLayer");
       if (!this.state.shown) {
         return <span />;
+      } else {
       }
       return (
-        <Modal onRequestClose={this.handleClick}>
-          <h1>Hello!</h1>
-          Look at these sweet reactive updates: {this.state.modalShown}
-        </Modal>
+        <Popup url={'api/player/'+this.state.activePlayer} onRequestClose={this.handleClick}></Popup>
       );
-    },*/
+    },
+    _onPlayerClicked: function(id) {
+      console.log("App.onPlayerClicked: ", id);
+      document.getElementById('popup_node').className = 'visible';
+      this.setState({shown: !this.state.shown, activePlayer: id});
+    },
     render: function() {
+      var that = this;
       return (
         <div>
           <div className="playerlist_title" >Player ranking</div>
-          <PlayersList url="api/players" />
+          <PlayersList url="api/players" onPlayerClicked={that._onPlayerClicked}/>
+          <div id="popup_node" className="hidden" ></div>
         </div>
       );
     }
@@ -102,7 +103,12 @@
     componentDidMount: function() {
       this.loadPlayersFromServer();
     },
+    _onPlayerClicked: function(id) {
+      console.log("PlayersList.onPlayerClicked: ", id);
+      this.props.onPlayerClicked(id);
+    },
     render: function() {
+      var that = this;
       var playerItems = this.state.data.map(function(player, index) {
         return (
           <PlayerItem name={player.name} 
@@ -110,7 +116,8 @@
                       position={player.positionText}
                       team={player.teamName}
                       id={player.id}
-                      key={index}>
+                      key={player.id}
+                      onPlayerClicked={that._onPlayerClicked}>
           </PlayerItem>
         );
       });
@@ -123,36 +130,19 @@
   });
 
   var PlayerItem = React.createClass({
-    mixins: [LayeredComponentMixin],
     handleClick: function() {
-      this.setState({shown: !this.state.shown});
-      console.log("PlayerItem.handleClick");
-      //this.renderLayer();
-    },
-    getInitialState: function() {
-      return {shown: false, modalShown: false};
-    },
-    componentDidMount: function() {
-      console.log("PlayerItem.componentDidMount");
-    },
-    renderLayer: function() {
-      console.log("PlayerItem.renderLayer");
-      if (!this.state.shown) {
-        return <span />;
-      }
-      return (
-        <Modal url={'api/player/'+this.props.id} onRequestClose={this.handleClick}></Modal>
-      );
+      //console.log("PlayerItem.handleClick");
+      this.props.onPlayerClicked(this.props.id);
     },
     render: function() {
-      console.log("PlayerItem.render: shown state: ", this.state.shown);
+      //console.log("PlayerItem.render: shown state: ", this.state.shown);
       return (
         <div className="playerlist_item" onClick={this.handleClick}>
-          
+
           <div className="playerlist_item_rank">
             {this.props.rank}
           </div>
-          
+
           <div className="playerlist_item_right_container">
             <div className="playerlist_item_name">
               {this.props.name}
@@ -167,8 +157,8 @@
   });
 
 
-
-  var Modal = React.createClass({
+  // Popup component
+  var Popup = React.createClass({
     loadPlayerFromServer: function() {
       $.ajax({
         url: this.props.url,
@@ -188,52 +178,89 @@
       this.loadPlayerFromServer();
     },
     killClick: function(e) {
-      // clicks on the content shouldn't close the modal
+      // clicks on the content shouldn't close the popup
       e.stopPropagation();
     },
     handleBackdropClick: function() {
-      // when you click the background, the user is requesting that the modal gets closed.
-      // note that the modal has no say over whether it actually gets closed. the owner of the
-      // modal owns the state. this just "asks" to be closed.
+      // when you click the background, the user is requesting that the popup gets closed.
+      // note that the popup has no say over whether it actually gets closed. the owner of the
+      // popup owns the state. this just "asks" to be closed.
       this.props.onRequestClose();
     },
     render: function() {
-      console.log("Modal.render, data: ", this.state.data);
+
+      var passPercentage = (1 * this.state.data.passSuccess).toFixed(2); //round
+      
       return (
-        <div className="ModalBackdrop" onClick={this.handleBackdropClick}>
-          <div className="ModalContent" onClick={this.killClick}>
-            <div className="playerlist_item" >
-              <div className="playerlist_item_rank">
-                {this.state.data.ranking}
-              </div>
+        <div className="popup_backdrop" onClick={this.handleBackdropClick}>
+          <div className="popup_content" onClick={this.killClick}>
+            <div className="player_header" >
+
               <div className="playerlist_item_right_container">
                 <div className="playerlist_item_name">
                   {this.state.data.name}
                 </div>
                 <div className="playerlist_item_subinfo">
-                  {this.state.data.positionText + ', ' + this.state.data.teamName}
+                  {this.state.data.teamName}
                 </div>
               </div>
             </div>
-            <div className="player_info" >
-              <div className="info_title">Weight</div>
-              <div className="info_value">{this.state.data.weight}</div>
+            <div>
+              <div className="player_info_header" >Player info</div>
+              <div className="player_info" >
+                <div className="info_title">Weight</div>
+                <div className="info_value">{this.state.data.weight}</div>
+              </div>
+              <div className="player_info" >
+                <div className="info_title">Height</div>
+                <div className="info_value">{this.state.data.height}</div>
+              </div>
+              <div className="player_info" >
+                <div className="info_title">Age</div>
+                <div className="info_value">{this.state.data.age}</div>
+              </div>
+              <div className="player_info" >
+                <div className="info_title">Position</div>
+                <div className="info_value">{this.state.data.positionText}</div>
+              </div>
             </div>
-            <div className="player_info" >
-              <div className="info_title">Height</div>
-              <div className="info_value">{this.state.data.height}</div>
-            </div>
-            <div className="player_info" >
-              <div className="info_title">Age</div>
-              <div className="info_value">{this.state.data.age}</div>
-            </div>
-            <div className="player_info" >
-              <div className="info_title">Goals</div>
-              <div className="info_value">{this.state.data.goal}</div>
-            </div>
-            <div className="player_info" >
-              <div className="info_title">Assists</div>
-              <div className="info_value">{this.state.data.assistTotal}</div>
+            <div>
+              <div className="player_info_header" >{'Statistics season ' + this.state.data.seasonName}</div>
+              <div className="player_info" >
+                <div className="info_title">Goals</div>
+                <div className="info_value">{this.state.data.goal}</div>
+              </div>
+              <div className="player_info" >
+                <div className="info_title">Assists</div>
+                <div className="info_value">{this.state.data.assistTotal}</div>
+              </div>
+              <div className="player_info" >
+                <div className="info_title">Played positions</div>
+                <div className="info_value">{this.state.data.playedPositions}</div>
+              </div>
+              <div className="player_info" >
+                <div className="info_title">Appearances</div>
+                <div className="info_value">{this.state.data.apps}</div>
+              </div>
+              <div className="player_info" >
+                <div className="info_title">Appearances as sub</div>
+                <div className="info_value">{this.state.data.subOn}</div>
+              </div>
+              <div className="player_info" >
+                <div className="info_title">Cards</div>
+                <div className="info_value">
+                  <div className="card yellow">{this.state.data.yellowCard}</div>
+                  <div className="card red">{this.state.data.redCard}</div>
+                </div>
+              </div>
+              <div className="player_info" >
+                <div className="info_title">Pass percentage</div>
+                <div className="info_value">{passPercentage}</div>
+              </div>
+              <div className="player_info" >
+                <div className="info_title">Minutes played</div>
+                <div className="info_value">{this.state.data.minsPlayed}</div>
+              </div>
             </div>
           </div>
         </div>
@@ -241,7 +268,7 @@
     }
   });
 
-    React.render(<App />, document.body);
+  React.render(<App />, document.body);
 
 }());
 
@@ -284,4 +311,3 @@ player data object  {
   isManOfTheMatch: 'FALSE',
   playedPositionsShort: 'M(LR),FW' }
 */
-
