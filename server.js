@@ -18,11 +18,6 @@
     if(!playersJson) {return {}}
     for (key in playersJson) {
       if (playersJson.hasOwnProperty(key) && playersJson[key].playerId === id) {
-        /*obj = {'id': playersJson[key].playerId,
-               'name': playersJson[key].name,
-               'ranking': playersJson[key].ranking,
-               'teamName': playersJson[key].teamName,
-               'positionText': playersJson[key].positionText};*/
         return playersJson[key];
       }
     }
@@ -47,12 +42,8 @@
                  'teamName': playersJson[key].teamName,
                  'positionText': playersJson[key].positionText};
           playersSimplifiedJson.push(obj);
-          if(playersJson[key].ranking === '1'){
-            console.log('simplified JSON:', obj);
-          }
         }
       }
-      //console.log('simplified JSON:', playersSimplifiedJson);
     }
   });
 
@@ -68,10 +59,9 @@
     res.send(playersSimplifiedJson);
   });
 
-  ///api/player/:id
+  // send one players full stats
   app.get('/api/player/:id', function (req, res) {
     var obj = getPlayerById(req.params.id);
-    console.log('asking for ', obj);
     res.setHeader('Content-Type', 'application/json');
     res.send(obj);
   });
