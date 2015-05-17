@@ -225,6 +225,7 @@
       );
     }
   });
+  
   var InfoLine = React.createClass({
     render: function() {
       return (
