@@ -3,25 +3,21 @@
 
   var LayeredComponentMixin = {
     componentDidMount: function() {
-      console.log("LayeredComponentMixin.componentDidMount");
       this._layer = document.getElementById('popup_node');
       this._renderLayer();
     },
 
     componentDidUpdate: function() {
-      console.log("LayeredComponentMixin.componentDidUpdate");
       this._renderLayer();
     },
 
     componentWillUnmount: function() {
-      console.log("LayeredComponentMixin.componentWillUnmount");
       this._unrenderLayer();
       var popupNode = document.getElementById('popup_node');
       popupNode.removeChild(this._layer);
     },
 
     _renderLayer: function() {
-      console.log("LayeredComponentMixin._renderLayer");
       var layerElement = this.renderLayer();
 
       if (layerElement === null) {
@@ -36,7 +32,6 @@
     },
 
     _unrenderLayer: function() {
-      console.log("LayeredComponentMixin._unrenderLayer");
       if (this.layerWillUnmount) {
         this.layerWillUnmount(this._layer);
       }
@@ -47,9 +42,9 @@
   var App = React.createClass({
     mixins: [LayeredComponentMixin],
     handleClick: function() {
-      //console.log("PlayerItem.handleClick");
       var that = this;
       document.getElementById('popup_node').className = 'hidden';
+      // use a timeout to ensure animation is done before removing the node
       setTimeout(function() {
         that.setState({shown: !that.state.shown});
       }, 200);
@@ -58,7 +53,6 @@
       return {shown: false, activePlayer: 0};
     },
     renderLayer: function() {
-      //console.log("PlayerItem.renderLayer");
       if (!this.state.shown) {
         return <span />;
       } else {
@@ -68,7 +62,6 @@
       );
     },
     _onPlayerClicked: function(id) {
-      console.log("App.onPlayerClicked: ", id);
       document.getElementById('popup_node').className = 'visible';
       this.setState({shown: !this.state.shown, activePlayer: id});
     },
@@ -104,7 +97,6 @@
       this.loadPlayersFromServer();
     },
     _onPlayerClicked: function(id) {
-      console.log("PlayersList.onPlayerClicked: ", id);
       this.props.onPlayerClicked(id);
     },
     render: function() {
@@ -131,11 +123,9 @@
 
   var PlayerItem = React.createClass({
     handleClick: function() {
-      //console.log("PlayerItem.handleClick");
       this.props.onPlayerClicked(this.props.id);
     },
     render: function() {
-      //console.log("PlayerItem.render: shown state: ", this.state.shown);
       return (
         <div className="playerlist_item" onClick={this.handleClick}>
 
@@ -190,7 +180,7 @@
     render: function() {
 
       var passPercentage = (1 * this.state.data.passSuccess).toFixed(2); //round
-      
+
       return (
         <div className="popup_backdrop" onClick={this.handleBackdropClick}>
           <div className="popup_content" onClick={this.killClick}>
@@ -207,45 +197,14 @@
             </div>
             <div>
               <div className="player_info_header" >Player info</div>
-              <div className="player_info" >
-                <div className="info_title">Weight</div>
-                <div className="info_value">{this.state.data.weight}</div>
-              </div>
-              <div className="player_info" >
-                <div className="info_title">Height</div>
-                <div className="info_value">{this.state.data.height}</div>
-              </div>
-              <div className="player_info" >
-                <div className="info_title">Age</div>
-                <div className="info_value">{this.state.data.age}</div>
-              </div>
-              <div className="player_info" >
-                <div className="info_title">Position</div>
-                <div className="info_value">{this.state.data.positionText}</div>
-              </div>
+              <InfoLine infoString="Age" infoValue={this.state.data.age}></InfoLine>
+              <InfoLine infoString="Weight" infoValue={this.state.data.weight}></InfoLine>
+              <InfoLine infoString="Height" infoValue={this.state.data.height}></InfoLine>
             </div>
             <div>
               <div className="player_info_header" >{'Statistics season ' + this.state.data.seasonName}</div>
-              <div className="player_info" >
-                <div className="info_title">Goals</div>
-                <div className="info_value">{this.state.data.goal}</div>
-              </div>
-              <div className="player_info" >
-                <div className="info_title">Assists</div>
-                <div className="info_value">{this.state.data.assistTotal}</div>
-              </div>
-              <div className="player_info" >
-                <div className="info_title">Played positions</div>
-                <div className="info_value">{this.state.data.playedPositions}</div>
-              </div>
-              <div className="player_info" >
-                <div className="info_title">Appearances</div>
-                <div className="info_value">{this.state.data.apps}</div>
-              </div>
-              <div className="player_info" >
-                <div className="info_title">Appearances as sub</div>
-                <div className="info_value">{this.state.data.subOn}</div>
-              </div>
+              <InfoLine infoString="Goals" infoValue={this.state.data.goal}></InfoLine>
+              <InfoLine infoString="Assists" infoValue={this.state.data.assistTotal}></InfoLine>
               <div className="player_info" >
                 <div className="info_title">Cards</div>
                 <div className="info_value">
@@ -253,20 +212,30 @@
                   <div className="card red">{this.state.data.redCard}</div>
                 </div>
               </div>
-              <div className="player_info" >
-                <div className="info_title">Pass percentage</div>
-                <div className="info_value">{passPercentage}</div>
-              </div>
-              <div className="player_info" >
-                <div className="info_title">Minutes played</div>
-                <div className="info_value">{this.state.data.minsPlayed}</div>
-              </div>
+              <InfoLine infoString="Position" infoValue={this.state.data.positionText}></InfoLine>
+              <InfoLine infoString="Played positions" infoValue={this.state.data.playedPositions}></InfoLine>
+              <InfoLine infoString="Appearances" infoValue={this.state.data.apps}></InfoLine>
+              <InfoLine infoString="Appearances as sub" infoValue={this.state.data.subOn}></InfoLine>
+              <InfoLine infoString="Pass percentage" infoValue={passPercentage}></InfoLine>
+              <InfoLine infoString="Minutes played" infoValue={this.state.data.minsPlayed}></InfoLine>
+              
             </div>
           </div>
         </div>
       );
     }
   });
+  var InfoLine = React.createClass({
+    render: function() {
+      return (
+        <div className="player_info" >
+          <div className="info_title">{this.props.infoString}</div>
+          <div className="info_value">{this.props.infoValue}</div>
+        </div>
+      );
+    }
+  });
+
 
   React.render(<App />, document.body);
 
